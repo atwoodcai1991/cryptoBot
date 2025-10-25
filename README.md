@@ -13,7 +13,7 @@
   - 成交量分析
 
 - **AI智能分析**
-  - 集成ChatGPT进行市场分析
+  - 集成 Google Gemini AI 进行市场分析（完全免费！）
   - 提供买卖建议和信心度评估
   - 风险因素分析
 
@@ -43,7 +43,7 @@
 - **MongoDB** - 数据库
 - **Mongoose** - ODM
 - **Binance API** - 交易所接口
-- **OpenAI** - AI分析
+- **Google Gemini AI** - AI分析（免费版）
 - **Technical Indicators** - 技术指标计算
 - **Winston** - 日志系统
 
@@ -61,7 +61,7 @@
 - Node.js 16+ 
 - MongoDB 4.4+
 - 币安账户（用于实盘交易）
-- OpenAI API密钥（用于AI分析）
+- Google Gemini API密钥（用于AI分析，完全免费！）
 
 ### 1. 克隆项目
 ```bash
@@ -105,12 +105,12 @@ BINANCE_API_KEY=your_binance_api_key_here
 BINANCE_API_SECRET=your_binance_secret_key_here
 BINANCE_TESTNET=true
 
-# OpenAI Configuration
-OPENAI_API_KEY=your_openai_api_key_here
+# Google Gemini AI Configuration (Free!)
+GEMINI_API_KEY=your_gemini_api_key_here
 
 # Trading Configuration
 DEFAULT_TRADE_AMOUNT=100
-MAX_POSITION_SIZE=1000
+MAX_POSITION_SIZE=1000000
 RISK_PERCENTAGE=2
 STOP_LOSS_PERCENTAGE=2
 TAKE_PROFIT_PERCENTAGE=5
@@ -346,8 +346,9 @@ cryptoBot/
 
 ### 问题：AI分析失败
 解决方案：
-- 验证OpenAI API密钥
-- 检查API额度
+- 验证 Gemini API 密钥
+- 运行测试：`node test-gemini.js`
+- 检查免费配额（每天 1,500 次）
 - 查看日志错误信息
 
 ## 🤝 贡献

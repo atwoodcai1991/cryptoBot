@@ -1,11 +1,53 @@
 const Binance = require('binance-api-node').default;
 const logger = require('../utils/logger');
+const https = require('https');
+const http = require('http');
+const { HttpsProxyAgent } = require('https-proxy-agent');
 
 class BinanceService {
   constructor() {
     this.client = null;
     this.isTestnet = process.env.BINANCE_TESTNET === 'true';
+    this.setupGlobalProxy(); // 在初始化客户端之前设置全局代理
     this.initialize();
+  }
+
+  setupGlobalProxy() {
+    const proxyUrl = process.env.HTTPS_PROXY || process.env.HTTP_PROXY;
+    if (proxyUrl) {
+      try {
+        // 为 node-fetch 设置全局代理（binance-api-node 使用 isomorphic-fetch）
+        const proxyAgent = new HttpsProxyAgent(proxyUrl);
+        this.proxyAgent = proxyAgent;
+        
+        // 同时设置 Node.js https 模块的代理（兜底方案）
+        const originalHttpsRequest = https.request;
+        https.request = function(options, callback) {
+          if (typeof options === 'string') {
+            options = new URL(options);
+          }
+          if (!options.agent && !options.createConnection) {
+            options.agent = proxyAgent;
+          }
+          return originalHttpsRequest.call(https, options, callback);
+        };
+        
+        // 为 node-fetch 设置全局 agent
+        const originalFetch = global.fetch;
+        if (originalFetch) {
+          global.fetch = function(url, options = {}) {
+            if (!options.agent) {
+              options.agent = proxyAgent;
+            }
+            return originalFetch(url, options);
+          };
+        }
+        
+        logger.info(`Global proxy configured for Binance: ${proxyUrl}`);
+      } catch (error) {
+        logger.warn(`Failed to setup global proxy: ${error.message}`);
+      }
+    }
   }
 
   initialize() {
@@ -18,6 +60,16 @@ class BinanceService {
       if (this.isTestnet) {
         config.httpBase = 'https://testnet.binance.vision';
         config.wsBase = 'wss://testnet.binance.vision/ws';
+      }
+
+      // 如果有代理，尝试传递给 binance-api-node
+      if (this.proxyAgent) {
+        // binance-api-node 的 fetch 选项
+        config.httpAgent = this.proxyAgent;
+        config.httpsAgent = this.proxyAgent;
+        
+        // 设置 getAgent 函数（binance-api-node 的另一种方式）
+        config.getAgent = () => this.proxyAgent;
       }
 
       this.client = Binance(config);
@@ -63,13 +115,23 @@ class BinanceService {
   }
 
   // Get historical candles/klines
-  async getKlines(symbol, interval, limit = 500) {
+  async getKlines(symbol, interval, limit = 500, startTime = null, endTime = null) {
     try {
-      const candles = await this.client.candles({
+      const params = {
         symbol,
         interval,
         limit
-      });
+      };
+
+      // Add time parameters if provided
+      if (startTime) {
+        params.startTime = startTime;
+      }
+      if (endTime) {
+        params.endTime = endTime;
+      }
+
+      const candles = await this.client.candles(params);
 
       return candles.map(candle => ({
         openTime: candle.openTime,

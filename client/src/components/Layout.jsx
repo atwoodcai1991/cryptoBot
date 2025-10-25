@@ -21,78 +21,129 @@ export default function Layout({ children }) {
   const location = useLocation();
 
   return (
-    <div className="flex h-screen bg-[#0f1419]">
+    <div className="layout-container">
       {/* Sidebar */}
-      <div className="w-64 bg-[#16181c] border-r border-[#2f3336]">
-        <div className="flex flex-col h-full">
+      <div className="sidebar">
+        <div className="sidebar-inner">
           {/* Logo */}
-          <div className="p-6">
-            <h1 className="text-2xl font-bold text-[#1d9bf0]">CryptoBot</h1>
-            <p className="text-sm text-[#8b98a5] mt-1">AI Trading Platform</p>
+          <div className="sidebar-logo">
+            <div className="sidebar-logo-inner">
+              <div className="sidebar-logo-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+              </div>
+              <div className="sidebar-logo-text">
+                <h1>CryptoBot</h1>
+                <p>AI Trading Platform</p>
+              </div>
+            </div>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-3">
+          <nav className="sidebar-nav">
             {navigation.map((item) => {
               const isActive = location.pathname === item.href;
+              const Icon = item.icon;
               return (
                 <Link
                   key={item.name}
                   to={item.href}
-                  className={`
-                    flex items-center px-3 py-3 mb-1 rounded-lg text-sm font-medium
-                    transition-colors
-                    ${isActive
-                      ? 'bg-[#1d9bf0] text-white'
-                      : 'text-[#e7e9ea] hover:bg-[#1a1f26]'
-                    }
-                  `}
+                  className={`sidebar-nav-link ${isActive ? 'sidebar-nav-link-active' : 'sidebar-nav-link-inactive'}`}
                 >
-                  <item.icon className="h-5 w-5 mr-3" />
-                  {item.name}
+                  <Icon className={`sidebar-nav-icon ${!isActive ? 'sidebar-nav-icon-inactive' : ''}`} />
+                  <span>{item.name}</span>
                 </Link>
               );
             })}
           </nav>
 
           {/* Footer */}
-          <div className="p-4 border-t border-[#2f3336]">
-            <div className="text-xs text-[#8b98a5]">
-              <div className="flex items-center justify-between mb-2">
-                <span>状态</span>
-                <span className="flex items-center">
-                  <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                  在线
-                </span>
+          <div className="sidebar-footer">
+            <div className="sidebar-footer-card">
+              <div className="sidebar-footer-status">
+                <span className="sidebar-footer-status-label">系统状态</span>
+                <div className="sidebar-footer-status-value">
+                  <div className="sidebar-footer-status-indicator">
+                    <span className="sidebar-footer-status-dot"></span>
+                    <span className="sidebar-footer-status-ping"></span>
+                  </div>
+                  <span className="sidebar-footer-status-text">在线</span>
+                </div>
               </div>
-              <div className="text-[#5b6570]">v1.0.0</div>
+              <div className="sidebar-footer-version">
+                <span className="sidebar-footer-version-label">版本</span>
+                <span className="sidebar-footer-version-value">v1.0.0</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="main-content">
         {/* Header */}
-        <header className="bg-[#16181c] border-b border-[#2f3336] px-6 py-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-[#e7e9ea]">
-              {navigation.find(item => item.href === location.pathname)?.name || '仪表盘'}
-            </h2>
-            <div className="flex items-center space-x-4">
-              <div className="text-sm text-[#8b98a5]">
-                {new Date().toLocaleString('zh-CN')}
+        <header className="main-header">
+          <div className="main-header-inner">
+            <div className="main-header-content">
+              {/* Left section - Page title with icon */}
+              <div className="main-header-left">
+                <div className="main-header-icon">
+                  {navigation.find(item => item.href === location.pathname)?.icon && (
+                    <div className="main-header-icon-inner">
+                      {(() => {
+                        const Icon = navigation.find(item => item.href === location.pathname)?.icon;
+                        return Icon ? <Icon /> : null;
+                      })()}
+                    </div>
+                  )}
+                </div>
+                <div className="main-header-text">
+                  <h2>
+                    {navigation.find(item => item.href === location.pathname)?.name || '仪表盘'}
+                  </h2>
+                  <p>实时监控和管理您的交易策略</p>
+                </div>
+              </div>
+
+              {/* Right section - Status and info */}
+              <div className="main-header-right">
+                {/* System Status */}
+                <div className="header-status-card">
+                  <div className="header-status-indicator">
+                    <span className="header-status-dot"></span>
+                    <span className="header-status-ping"></span>
+                  </div>
+                  <span className="header-status-text">系统在线</span>
+                </div>
+
+                {/* Server Status */}
+                <div className="header-server-card">
+                  <svg className="header-server-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
+                  </svg>
+                  <span className="header-server-text">已连接</span>
+                </div>
+
+                {/* Current time */}
+                <div className="header-time-card">
+                  <span className="header-time-value">
+                    {new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                  <span className="header-time-date">
+                    {new Date().toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' })}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="main-page-content">
           {children}
         </main>
       </div>
     </div>
   );
 }
-

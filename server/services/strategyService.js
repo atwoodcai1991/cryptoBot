@@ -328,10 +328,31 @@ class StrategyService {
   }
 
   // Calculate position size based on risk management
-  calculatePositionSize(accountBalance, riskPercentage, entryPrice, stopLossPrice) {
+  calculatePositionSize(accountBalance, riskPercentage, entryPrice, stopLossPrice, maxPositionSize = null) {
     const riskAmount = accountBalance * (riskPercentage / 100);
     const priceRisk = Math.abs(entryPrice - stopLossPrice);
-    const positionSize = riskAmount / priceRisk;
+    
+    // Avoid division by zero
+    if (priceRisk === 0) {
+      logger.warn('Price risk is zero, cannot calculate position size');
+      return 0;
+    }
+    
+    let positionSize = riskAmount / priceRisk;
+    let positionValue = positionSize * entryPrice;
+    
+    // If maxPositionSize is set and position value exceeds it, reduce position size
+    if (maxPositionSize && positionValue > maxPositionSize) {
+      positionSize = maxPositionSize / entryPrice;
+      positionValue = maxPositionSize;
+      logger.info(`Position size reduced to fit maxPositionSize: ${maxPositionSize}`);
+    }
+    
+    // Also ensure position value doesn't exceed account balance
+    if (positionValue > accountBalance) {
+      positionSize = accountBalance / entryPrice;
+      logger.info(`Position size reduced to fit account balance: ${accountBalance}`);
+    }
     
     return parseFloat(positionSize.toFixed(8));
   }

@@ -84,9 +84,10 @@ BINANCE_API_KEY=你的币安API密钥
 BINANCE_API_SECRET=你的币安密钥
 BINANCE_TESTNET=true  # 建议先使用测试网
 
-# OpenAI API配置（可选，用于AI分析）
-# 获取地址：https://platform.openai.com/api-keys
-OPENAI_API_KEY=你的OpenAI_API密钥
+# Google Gemini AI 配置（可选，用于AI分析）
+# 获取地址：https://makersuite.google.com/app/apikey
+# 完全免费！每天 1,500 次请求
+GEMINI_API_KEY=你的Gemini_API密钥
 
 # 交易配置（可选）
 DEFAULT_TRADE_AMOUNT=100
@@ -120,15 +121,15 @@ cd ..
 - 测试网可以获得虚拟资金进行测试
 - 在`.env`中设置`BINANCE_TESTNET=true`
 
-### 2. OpenAI API密钥（可选）
+### 2. Google Gemini API密钥（可选，用于AI分析）
 
-1. 访问 https://platform.openai.com
-2. 注册/登录账户
-3. 进入"API Keys"页面
-4. 创建新的API密钥
+1. 访问 https://makersuite.google.com/app/apikey
+2. 使用 Google 账号登录
+3. 点击 "Create API Key"
+4. 复制生成的 API 密钥
 5. 保存密钥（只显示一次）
 
-注意：OpenAI API是付费服务，需要充值才能使用
+✨ **优势**：Gemini 免费版完全免费，每天 1,500 次请求，无需信用卡！
 
 ## 四、启动项目
 
@@ -242,15 +243,16 @@ Network Error
 - 检查`client/.env`中的API_URL配置
 - 查看浏览器控制台错误信息
 
-### 问题5：OpenAI API错误
+### 问题5：Gemini API错误
 ```
-Error: 401 Unauthorized
+Error: API key not valid
 ```
 
 解决方案：
-- 验证OpenAI API密钥是否正确
-- 检查OpenAI账户是否有足够余额
-- 如果不使用AI功能，在策略中禁用"AI分析"
+- 验证 Gemini API 密钥是否正确
+- 检查 `.env` 文件中的 GEMINI_API_KEY 配置
+- 运行测试脚本：`node test-gemini.js`
+- 如果不使用 AI 功能，在策略中禁用"AI分析"
 
 ## 七、生产环境部署
 

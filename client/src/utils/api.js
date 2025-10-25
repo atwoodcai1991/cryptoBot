@@ -77,6 +77,30 @@ export const accountAPI = {
   update: (id, data) => api.put(`/account/${id}`, data),
 };
 
+// Status APIs
+export const statusAPI = {
+  getAll: () => api.get('/status/all'),
+  getAI: () => api.get('/status/ai'),
+  getBinance: () => api.get('/status/binance'),
+};
+
+// System Config APIs
+export const systemConfigAPI = {
+  get: () => api.get('/system-config'),
+  update: (data) => api.put('/system-config', data),
+  reset: () => api.post('/system-config/reset'),
+};
+
+// Data Cache APIs
+export const dataCacheAPI = {
+  getStats: () => api.get('/data-cache/stats'),
+  getDetails: (symbol, interval) => api.get(`/data-cache/${symbol}/${interval}`),
+  warmup: (symbols, intervals, days) => api.post('/data-cache/warmup', { symbols, intervals, days }),
+  update: (symbol, interval) => api.post('/data-cache/update', { symbol, interval }),
+  refresh: (symbol, interval, startDate, endDate, days) => api.post('/data-cache/refresh', { symbol, interval, startDate, endDate, days }),
+  clear: (symbol, interval) => api.delete('/data-cache/clear', { params: { symbol, interval } }),
+};
+
 // Health check
 export const healthCheck = () => api.get('/health');
 

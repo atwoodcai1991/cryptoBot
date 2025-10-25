@@ -100,17 +100,18 @@ class TradingService {
         await account.save();
       }
 
-      // Calculate position size
+      // Calculate position size (now includes maxPositionSize check)
       const positionSize = strategyService.calculatePositionSize(
         account.balance,
         strategy.riskManagement.riskPercentage,
         currentPrice,
-        riskLevels.stopLoss
+        riskLevels.stopLoss,
+        strategy.riskManagement.maxPositionSize
       );
 
       // Check if position size is valid
-      if (positionSize * currentPrice > strategy.riskManagement.maxPositionSize) {
-        logger.warn('Position size exceeds maximum allowed');
+      if (positionSize === 0) {
+        logger.warn('Position size is zero or invalid');
         return {
           executed: false,
           reason: 'Position size exceeds maximum',

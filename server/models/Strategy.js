@@ -1,5 +1,24 @@
 const mongoose = require('mongoose');
 
+// 获取系统配置的默认值
+async function getDefaultValue(path, fallback) {
+  try {
+    const SystemConfig = mongoose.model('SystemConfig');
+    const config = await SystemConfig.getConfig();
+    
+    // 根据路径获取值
+    const pathParts = path.split('.');
+    let value = config;
+    for (const part of pathParts) {
+      value = value?.[part];
+    }
+    
+    return value !== undefined ? value : fallback;
+  } catch (error) {
+    return fallback;
+  }
+}
+
 const strategySchema = new mongoose.Schema({
   name: {
     type: String,
@@ -51,18 +70,42 @@ const strategySchema = new mongoose.Schema({
     }
   },
   riskManagement: {
-    maxPositionSize: { type: Number, default: 1000 },
-    stopLossPercentage: { type: Number, default: 2 },
-    takeProfitPercentage: { type: Number, default: 5 },
-    riskPercentage: { type: Number, default: 2 }
+    maxPositionSize: { 
+      type: Number, 
+      default: async function() {
+        return await getDefaultValue('riskManagement.maxPositionSize', 5000);
+      }
+    },
+    stopLossPercentage: { 
+      type: Number, 
+      default: async function() {
+        return await getDefaultValue('riskManagement.stopLossPercentage', 2);
+      }
+    },
+    takeProfitPercentage: { 
+      type: Number, 
+      default: async function() {
+        return await getDefaultValue('riskManagement.takeProfitPercentage', 5);
+      }
+    },
+    riskPercentage: { 
+      type: Number, 
+      default: async function() {
+        return await getDefaultValue('riskManagement.riskPercentage', 2);
+      }
+    }
   },
   useAI: {
     type: Boolean,
-    default: true
+    default: async function() {
+      return await getDefaultValue('aiDefaults.useAI', true);
+    }
   },
   aiConfidenceThreshold: {
     type: Number,
-    default: 0.7
+    default: async function() {
+      return await getDefaultValue('aiDefaults.confidenceThreshold', 0.7);
+    }
   },
   performance: {
     totalTrades: { type: Number, default: 0 },

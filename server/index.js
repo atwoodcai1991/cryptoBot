@@ -14,6 +14,9 @@ const backtestRoutes = require('./routes/backtest');
 const aiAnalysisRoutes = require('./routes/aiAnalysis');
 const orderRoutes = require('./routes/orders');
 const accountRoutes = require('./routes/account');
+const statusRoutes = require('./routes/status');
+const systemConfigRoutes = require('./routes/systemConfig');
+const dataCacheRoutes = require('./routes/dataCache');
 
 // Initialize Express app
 const app = express();
@@ -34,8 +37,18 @@ mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-.then(() => {
+.then(async () => {
   logger.info('MongoDB connected successfully');
+  
+  // Initialize system configuration if not exists
+  const SystemConfig = require('./models/SystemConfig');
+  await SystemConfig.getConfig();
+  logger.info('System configuration initialized');
+  
+  // Start cache update scheduler
+  const cacheScheduler = require('./scheduler/cacheScheduler');
+  cacheScheduler.start();
+  logger.info('Cache update scheduler started');
 })
 .catch((err) => {
   logger.error('MongoDB connection error:', err);
@@ -49,6 +62,9 @@ app.use('/api/backtest', backtestRoutes);
 app.use('/api/ai-analysis', aiAnalysisRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/account', accountRoutes);
+app.use('/api/status', statusRoutes);
+app.use('/api/system-config', systemConfigRoutes);
+app.use('/api/data-cache', dataCacheRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

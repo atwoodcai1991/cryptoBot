@@ -84,7 +84,8 @@ const backtestSchema = new mongoose.Schema({
   }],
   equityCurve: [{
     date: Date,
-    balance: Number
+    balance: Number,
+    price: Number
   }],
   status: {
     type: String,
